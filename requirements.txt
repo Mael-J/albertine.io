@@ -1,0 +1,10 @@
+pandas
+reportlab
+python-dateutil
+XlsxWriter
+Flask
+flask_cors
+numpy
+beautifulsoup4
+investpy
+requests
