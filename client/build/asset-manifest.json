@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "./static/css/main.2600f71d.css",
+    "main.js": "./static/js/main.5e4badf9.js",
+    "static/media/Manifeste-de-la-finance-verte-et-transparente.pdf": "./static/media/Manifeste-de-la-finance-verte-et-transparente.dc33f849c55373450219.pdf",
+    "static/media/loading2.svg": "./static/media/loading2.66a6eab955f0ceab55f81d904e80468b.svg",
+    "index.html": "./index.html",
+    "main.2600f71d.css.map": "./static/css/main.2600f71d.css.map",
+    "main.5e4badf9.js.map": "./static/js/main.5e4badf9.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.2600f71d.css",
+    "static/js/main.5e4badf9.js"
+  ]
+}

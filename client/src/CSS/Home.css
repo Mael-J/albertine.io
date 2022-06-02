@@ -1,0 +1,25 @@
+.sidebar-toggle {
+    position: fixed;
+    top: 1rem;
+    left: 1rem;
+    font-size: 2rem;
+    background: transparent;
+    border-color: transparent;
+    color: var(--secondary-pink);
+    transition: var(--transition);
+    cursor: pointer;
+    animation: bounce 2s ease-in-out infinite;
+    z-index: 1;
+  }
+
+.menu-button-hidden {
+  display: None;
+}
+
+.menu-button-showed {
+  display: block;
+}
+
+
+
+  

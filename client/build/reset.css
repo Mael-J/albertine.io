@@ -1,0 +1,114 @@
+
+
+:root {
+  --bg-black:#252525;
+  --main-pink:#D39FC3;
+  --main-color: #A59FD3;
+  --secondary-blue: #3A2F8F;
+  --secondary-pink:#AB5E93;
+  --light-white : #F5F4FF;
+  --light-grey : #CFCFCF;
+  --transition: all 0.3s linear;
+  --spacing: 0.1rem;
+}
+
+body {
+  background-color: var(--bg-black);
+  color : white;
+  font-family: 'Nunito', sans-serif;
+}
+
+
+
+
+video {
+    pointer-events: none;
+  }
+
+
+  .ml-1 {
+    margin-left: 1em;
+  }
+.ml-2 {
+    margin-left: 2em;
+  }
+.ml-3 {
+    margin-left: 3em;
+  }
+.ml-4 {
+    margin-left: 4em;
+  }
+  
+.ml-5 {
+    margin-left: 5em;
+  }
+  
+.mt-1 {
+    margin-top: 1em;
+  }
+  
+.mt-2 {
+    margin-top: 2em;
+  }
+  
+.mt-3 {
+    margin-top: 3em;
+  }
+  
+.mt-4 {
+    margin-top: 4em;
+  }
+  
+.mt-5 {
+    margin-top: 5em;
+  }
+
+.w-10 {
+  width : 10%
+}
+
+.w-20 {
+  width : 20%
+}
+
+.w-30 {
+  width : 30%
+}
+
+.w-40 {
+  width : 40%
+}
+
+.w-50 {
+  width : 50%
+}
+
+.w-60 {
+  width : 60%
+}
+
+.w-70 {
+  width : 70%
+}
+.w-80 {
+  width : 80%
+}
+.w-90 {
+  width : 90%
+}
+.w-100 {
+  width : 100%
+}
+  
+
+ul {
+  list-style-type: none;
+}
+a {
+  text-decoration: none;
+}
+
+
+
+
+

@@ -1,0 +1,91 @@
+/*
+=============== 
+Sidebar
+===============
+*/
+.sidebar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+  }
+  .close-btn {
+    font-size: 1.75rem;
+    background: transparent;
+    border-color: transparent;
+    
+    transition: var(--transition);
+    cursor: pointer;
+    color: var(--secondary-blue);
+    margin-top: 0.2rem;
+  }
+  .close-btn:hover {
+    color: var(--secondary-pink);
+  }
+  .logo-sidebar {
+    justify-self: center;
+    height: 5rem;
+  }
+  
+  .links a {
+    display: flex;
+    align-items: center;
+    font-size: 1.25rem;
+    text-transform: capitalize;
+    padding: 1rem 1.5rem;
+    color: var(--secondary-blue);
+    transition: var(--transition);
+    letter-spacing: var(--spacing);
+  }
+  
+  .links a:hover {
+    background: var(--secondary-pink);
+    color: var(--secondary-blue);
+  }
+  .links a svg {
+    font-size: 1.5rem;
+    color: var(--secondary-blue);
+    margin-right: 1rem;
+    transition: var(--transition);
+  }
+  .links a:hover svg {
+    color: var(--secondary-blue);
+  }
+  .social-icons {
+    /* justify-self: center; */
+    display: flex;
+    padding-bottom: 2rem;
+  }
+  .social-icons a {
+    font-size: 1.5rem;
+    margin: 0 0.5rem;
+    color: var(--secondary-blue);
+    transition: var(--transition);
+  }
+  .social-icons a:hover {
+    color: var(--secondary-pink);
+  }
+  
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--main-pink);
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    row-gap: 1rem;
+    box-shadow: var(--secondary-blue);
+    transition: var(--transition);
+    transform: translate(-100%);
+    z-index: 10;
+  }
+  .show-sidebar {
+    transform: translate(0);
+  }
+  @media screen and (min-width: 676px) {
+    .sidebar {
+      width: 20rem;
+    }
+  }

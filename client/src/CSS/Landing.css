@@ -1,0 +1,52 @@
+.discover-button {
+    
+    cursor: pointer;
+    padding: 1rem 3rem;
+    background-color: var(--secondary-blue);
+    border-radius: 15px;
+    font-size: medium;
+    color: #F4F2F4;
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.3), 0 6px 20px 0 rgba(0,0,0,0.19);
+    border :none;
+    border-bottom: 4px solid var(--secondary-pink);
+    text-decoration: none;
+    
+    
+    
+}
+
+@media screen and (max-width: 500px) {
+    .container {
+      position: fixed;
+      text-align: center;
+    }
+  }
+
+
+
+.discover-button:hover {
+
+    background-color: var(--secondary-pink);
+
+    border-bottom: 4px solid var(--secondary-blue);
+    padding: 1.3rem 3.3rem;
+
+}
+
+
+.introduction {
+    
+    font-size: 2rem;
+    font-family: 'Source Sans Pro', sans-serif;
+    color: black;
+    align-content: center;
+    
+}
+
+.logo-landing {
+    max-width: 100%;
+    height: auto;
+    width: auto
+
+}

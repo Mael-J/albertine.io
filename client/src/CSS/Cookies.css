@@ -1,0 +1,38 @@
+
+
+.frame-cookie {
+    position : fixed;
+    width: 90%;
+    margin-left: 5rem;
+    background: var(--main-pink);
+    height: 50px;
+    bottom: 5px;
+    color: black;
+    border-radius: 10px;
+    
+    
+}
+
+.cookie-showed {
+    display: block;
+}
+
+.cookie-hidden {
+    display:none;
+}
+
+.text-cookie {
+   
+    padding-top: 15px;
+    
+}
+
+.button-cookie {
+
+    margin-left: 30px;
+    background: #A59FD3;
+    padding: 5px 30px;
+    border-radius: 5px;
+    cursor: pointer;
+    border: black 2px solid;
+}

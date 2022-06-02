@@ -1,0 +1,180 @@
+.button-delete {
+    color: #ee3333;
+    background: transparent;
+    border:none;
+}
+
+.button-addInput {
+    background-color:  var(--secondary-blue);
+    border: none;
+    border-radius: 4px;
+    
+    color: white;
+    padding: 6px 15px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 2px 5px;
+    cursor: pointer;
+    width: 15rem;
+  }
+
+  .button-export {
+
+    background-color:  var(--secondary-blue);
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    color: white;
+    padding: 6px 15px;
+    text-align: center;
+
+  }
+
+  .disclaimer {
+    width: 90%;
+    font-size: 14px;
+    text-align: justify;
+    padding-bottom: 2rem;
+    
+  }
+
+.first-col {
+  width: 15%;
+  font-weight: bolder;
+  
+}
+
+  .frame-text {
+    color: black;
+    background-color: var(--light-white);
+    border-radius: 0.8rem;
+    margin: 1rem;
+    padding: 1.5rem;
+    width: 90%;
+    word-break: break-word;
+    
+  }
+
+  .hline { 
+    width:25%; 
+    height:0.5px;
+    background: black ;
+    background-image: linear-gradient(to right,  var(--light-white), black,  var(--light-white));
+    
+  }
+.objective {
+      display: inline-grid;
+      text-align: justify;
+      
+      
+  }
+
+
+
+
+.performance-title {
+    display: inline-grid;
+    padding: 1%;
+}
+
+
+.scroll
+{
+    background-color:  var(--light-white);
+    color: black;
+    word-break: break-word;
+    
+}
+.scroll thead
+{
+    background-color:  var(--light-white);
+    display:block;
+    width: calc(100% - 16px);
+}
+ 
+.scroll tbody
+{
+    display:block;
+    max-height:16em;
+    overflow-y:scroll;
+    background-color:  var(--light-white);
+    width: calc(100% + 5px);
+    
+    
+ 
+}
+
+/* width */
+.specific-bar::-webkit-scrollbar {
+  width: 16px;
+  
+}
+
+/* Track */
+.specific-bar::-webkit-scrollbar-track {
+  background: var(--light-grey);
+  border-radius: 10px;
+  
+}
+
+/* Handle */
+.specific-bar::-webkit-scrollbar-thumb {
+  background: var(--secondary-blue);
+  border-radius: 10px;
+}
+
+/* Handle on hover */
+.specific-bar::-webkit-scrollbar-thumb:hover {
+  background: var(--secondary-blue);
+}
+ 
+.scroll tfoot
+{
+    background-color: var(--light-white);
+    display:block;
+    font-weight: bolder;
+    width: calc(100% - 16px);
+}
+ 
+.scroll td, .scroll th
+{
+    width: 10000rem;
+    text-align: center;
+}
+
+.sub-title {
+  text-align: center;
+  font-weight: bolder;  
+  font-size: larger;
+  
+}
+
+.table-data {
+  width:100%;
+  text-align: center;
+  word-break: break-word;
+  margin-top: 1rem;
+  
+}
+
+.table-exclude {
+  text-align: center;
+  border-collapse: collapse;
+}
+
+.table-exclude thead {
+  font-weight:600;
+}
+
+.table-exclude tr {
+  height: 4rem;
+}
+
+.table-exclude tbody tr {
+  border-top: solid rgba(50, 50, 50, 0.234);
+}
+
+
+
