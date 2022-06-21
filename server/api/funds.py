@@ -282,11 +282,30 @@ def get_info(code):
     #carbon metrics
     carbonMetrics = get_carbonMetrics(code,bearer, proxy_dict = proxy_dict)
 
+    #number of bonds
+    if 'numberOfBondHolding' in positions:
+      numberOfBondHolding = positions["numberOfBondHolding"]
+    else:
+      numberOfBondHolding = 0
+
+    #number of equities
+    if 'numberOfEquityHolding' in positions:
+      numberOfEquityHolding = positions["numberOfEquityHolding"]
+    else:
+      numberOfEquityHolding = 0
+
+    #number of other holdings
+    if 'numberOfOtherHolding' in positions:
+      numberOfOtherHolding = positions["numberOfOtherHolding"]
+    else:
+      numberOfOtherHolding = 0
+    
+
     result = {'infos': infos, 'pages' : pages, 'positions': positions, 
               'marketCap': marketCap,'sector' : sector,
               'creditQuality' : creditQuality,'stockStyle' : stockStyle, 'bondStyle' : bondStyle,
-              'esgData' : esgData, 'carbonMetrics' : carbonMetrics, 'numberOfBondHolding' : positions["numberOfBondHolding"],
-              'numberOfEquityHolding': positions["numberOfEquityHolding"], 'numberOfOtherHolding': positions["numberOfOtherHolding"]
+              'esgData' : esgData, 'carbonMetrics' : carbonMetrics, 'numberOfBondHolding' : numberOfBondHolding,
+              'numberOfEquityHolding': numberOfEquityHolding, 'numberOfOtherHolding': numberOfOtherHolding
               }
   
     return jsonify(result), 200
