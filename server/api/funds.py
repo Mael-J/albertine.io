@@ -1,4 +1,5 @@
 from flask import Blueprint, jsonify, request, send_file
+from pandas.core.frame import DataFrame
 from calculation.ms_scraping import fund_info, get_bearer_token, scrape_page, get_position, get_marketCap, get_sector, get_creditQuality, get_stockStyle, get_fixedIncomeStyle, get_esgData, get_carbonMetrics
 from myclass.report import REPORT, REPORTCANVA, REPORTCANVA2
 from investpy.utils.extra import random_user_agent
@@ -204,52 +205,62 @@ def download_excel():
     for d in data:
         df_buffer = pd.DataFrame()
         #equity holdings
-        df_equityHoldings = pd.DataFrame(d['positions']['equityHoldingPage']['holdingList'])
+        if 'equityHoldingPage' in d['positions']:
+          df_equityHoldings = pd.DataFrame(d['positions']['equityHoldingPage']['holdingList'])
+        else:
+          df_equityHoldings = pd.DataFrame()
         #bond holdings
-        df_bondHoldings = pd.DataFrame(d['positions']['boldHoldingPage']['holdingList'])
+        if 'boldHoldingPage' in d['positions']:
+          df_bondHoldings = pd.DataFrame(d['positions']['boldHoldingPage']['holdingList'])
+        else:
+          df_bondHoldings = pd.DataFrame()
         #other holdings
-        df_otherHoldings = pd.DataFrame(d['positions']['otherHoldingPage']['holdingList'])
+        if 'otherHoldingPage' in d['positions']:
+          df_otherHoldings = pd.DataFrame(d['positions']['otherHoldingPage']['holdingList'])
+        else:
+          df_otherHoldings = pd.DataFrame()
+        
         df_buffer = pd.concat([df_buffer, df_equityHoldings, df_bondHoldings, df_otherHoldings])
         df_buffer['portfolioId'] = d["infos"]['SecId']
         df_buffer['portfolioName'] = d["infos"]['LegalName']
         df_holdings = pd.concat([df_buffer, df_holdings])
 
     #blob
-    output =os.path.abspath(os.path.join(os.path.dirname( '__file__' ),'static/media', "albertine_letempsretrouve.xlsx"))
-    print(output)
-    # output = BytesIO()
-    # #to excel
-    # writer = pd.ExcelWriter(output, engine='xlsxwriter')
-    # #funds characteristics page
-    # df_infos.to_excel(writer, sheet_name='fundsCharacteristics', index = False)
-    # ##funds metrics page
-    # df_page.to_excel(writer, sheet_name='fundsMetrics', index = False)
-    # #bond Style page
-    # df_bonds.to_excel(writer, sheet_name='bondStyle', index = False)
-    # #carbon page
-    # df_carbon.to_excel(writer, sheet_name='carbonMetrics', index = False)
-    # #credit quality page
-    # df_creditQuality.to_excel(writer, sheet_name='creditQuality', index = False)
-    # #esg data page
-    # df_esgData.to_excel(writer, sheet_name='esgData', index = False)
-    # #esg calculation page
-    # df_esgScoreCalculation.to_excel(writer, sheet_name='esgScoreCalculation', index = False)
-    # #sustainabilityIntentionality page
-    # df_sustainabilityIntentionality.to_excel(writer, sheet_name='sustainabilityIntentionality', index = False)
-    # #marketCapitalization page
-    # df_marketCap.to_excel(writer, sheet_name='marketCapitalization', index = False)
-    # #holdings page
-    # df_holdings.to_excel(writer, sheet_name='holdings', index = False)
-    # #equity sector page
-    # df_equitySector.to_excel(writer, sheet_name='equitySector', index = False)
-    # #bonds sector page
-    # df_bondSector.to_excel(writer, sheet_name='bondSector', index = False)
-    # #stock style page
-    # df_stockStyle.to_excel(writer, sheet_name='stockStyle', index = False)
+    # output =os.path.abspath(os.path.join(os.path.dirname( '__file__' ),'static/media', "albertine_letempsretrouve.xlsx"))
+    # print(output)
+    output = BytesIO()
+    #to excel
+    writer = pd.ExcelWriter(output, engine='xlsxwriter')
+    #funds characteristics page
+    df_infos.to_excel(writer, sheet_name='fundsCharacteristics', index = False)
+    ##funds metrics page
+    df_page.to_excel(writer, sheet_name='fundsMetrics', index = False)
+    #bond Style page
+    df_bonds.to_excel(writer, sheet_name='bondStyle', index = False)
+    #carbon page
+    df_carbon.to_excel(writer, sheet_name='carbonMetrics', index = False)
+    #credit quality page
+    df_creditQuality.to_excel(writer, sheet_name='creditQuality', index = False)
+    #esg data page
+    df_esgData.to_excel(writer, sheet_name='esgData', index = False)
+    #esg calculation page
+    df_esgScoreCalculation.to_excel(writer, sheet_name='esgScoreCalculation', index = False)
+    #sustainabilityIntentionality page
+    df_sustainabilityIntentionality.to_excel(writer, sheet_name='sustainabilityIntentionality', index = False)
+    #marketCapitalization page
+    df_marketCap.to_excel(writer, sheet_name='marketCapitalization', index = False)
+    #holdings page
+    df_holdings.to_excel(writer, sheet_name='holdings', index = False)
+    #equity sector page
+    df_equitySector.to_excel(writer, sheet_name='equitySector', index = False)
+    #bonds sector page
+    df_bondSector.to_excel(writer, sheet_name='bondSector', index = False)
+    #stock style page
+    df_stockStyle.to_excel(writer, sheet_name='stockStyle', index = False)
 
-    # #save update
-    # writer.save()
-    # output.seek(0)
+    #save update
+    writer.save()
+    output.seek(0)
     return send_file(output, attachment_filename='output.xlsx', as_attachment=True)
 
 

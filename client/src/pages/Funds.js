@@ -345,12 +345,12 @@ const Funds = () => {
         return (
             <div>
                 <div>
-                    <label>Choix du portefeuille</label>
+                    <label>Choix de fonds (max. 3) </label>
                 </div>
                 <div>
                     
                     <Select 
-                    placeholder={"Choix du portefeuille"}
+                    placeholder={"Entrez un nom ou un isin"}
                     styles = {customStyles}
                     value ={portfolios}
                     options= {portList}
@@ -1034,53 +1034,133 @@ const Funds = () => {
                         //pass
                     } else {
                         if (obj['marketCap']['assetType'] === "EQUITY" || obj['marketCap']['assetType'] === 'ALLOCATION') {
+                            let prospectiveEarningsYield = null
+                            let prospectiveEarningsYieldColor = green
+                            if (obj['stockStyle']["fund"]["prospectiveEarningsYield"] !== null) {
+                                prospectiveEarningsYield = obj['stockStyle']["fund"]["prospectiveEarningsYield"]
+                                if (prospectiveEarningsYield < 0) {
+                                    prospectiveEarningsYieldColor = red
+                                }
+                            }
+                            let prospectiveBookValueYield = null
+                            let prospectiveBookValueYieldColor = green
+                            if (obj['stockStyle']["fund"]["prospectiveBookValueYield"] !== null) {
+                                prospectiveBookValueYield = obj['stockStyle']["fund"]["prospectiveBookValueYield"]
+                                if (prospectiveBookValueYield < 0) {
+                                    prospectiveBookValueYieldColor = red
+                                }
+                            }
+                            let prospectiveRevenueYield = null
+                            let prospectiveRevenueYieldColor = green
+                            if (obj['stockStyle']["fund"]["prospectiveRevenueYield"] !== null) {
+                                prospectiveRevenueYield = obj['stockStyle']["fund"]["prospectiveRevenueYield"]
+                                if (prospectiveRevenueYield < 0) {
+                                    prospectiveRevenueYieldColor = red
+                                }
+                            }
+                            let prospectiveCashFlowYield = null
+                            let prospectiveCashFlowYieldColor = green
+                            if (obj['stockStyle']["fund"]["prospectiveCashFlowYield"] !== null) {
+                                prospectiveCashFlowYield = obj['stockStyle']["fund"]["prospectiveCashFlowYield"]
+                                if (prospectiveCashFlowYield < 0) {
+                                    prospectiveCashFlowYieldColor = red
+                                }
+                            }
+                            let prospectiveDividendYield = null
+                            let prospectiveDividendYieldColor = green
+                            if (obj['stockStyle']["fund"]["prospectiveDividendYield"] !== null) {
+                                prospectiveDividendYield = obj['stockStyle']["fund"]["prospectiveDividendYield"]
+                                if (prospectiveDividendYield < 0) {
+                                    prospectiveDividendYieldColor = red
+                                }
+                            }
+                            let forecasted5YearEarningsGrowth = null
+                            let forecasted5YearEarningsGrowthColor = green
+                            if (obj['stockStyle']["fund"]["forecasted5YearEarningsGrowth"] !== null) {
+                                forecasted5YearEarningsGrowth = obj['stockStyle']["fund"]["forecasted5YearEarningsGrowth"]
+                                if (forecasted5YearEarningsGrowth < 0) {
+                                    forecasted5YearEarningsGrowthColor = red
+                                }
+                            }
+                            let forecastedEarningsGrowth = null
+                            let forecastedEarningsGrowthColor = green
+                            if (obj['stockStyle']["fund"]["forecastedEarningsGrowth"] !== null) {
+                                forecastedEarningsGrowth = obj['stockStyle']["fund"]["forecastedEarningsGrowth"]
+                                if (forecastedEarningsGrowth < 0) {
+                                    forecastedEarningsGrowthColor = red
+                                }
+                            }
 
+                            let forecastedBookValueGrowth = null
+                            let forecastedBookValueGrowthColor = green
+                            if (obj['stockStyle']["fund"]["forecastedBookValueGrowth"] !== null) {
+                                forecastedBookValueGrowth = obj['stockStyle']["fund"]["forecastedBookValueGrowth"]
+                                if (forecastedBookValueGrowth < 0) {
+                                    forecastedBookValueGrowthColor = red
+                                }
+                            }
+
+                            let forecastedRevenueGrowth = null
+                            let forecastedRevenueGrowthColor = green
+                            if (obj['stockStyle']["fund"]["forecastedRevenueGrowth"] !== null) {
+                                forecastedRevenueGrowth = obj['stockStyle']["fund"]["forecastedRevenueGrowth"]
+                                if (forecastedRevenueGrowth < 0) {
+                                    forecastedRevenueGrowthColor = red
+                                }
+                            }
+
+                            let forecastedCashFlowGrowth = null
+                            let forecastedCashFlowGrowthColor = green
+                            if (obj['stockStyle']["fund"]["forecastedCashFlowGrowth"] !== null) {
+                                forecastedCashFlowGrowth = obj['stockStyle']["fund"]["forecastedCashFlowGrowth"]
+                                if (forecastedCashFlowGrowth < 0) {
+                                    forecastedCashFlowGrowthColor = red
+                                }
+                            }
+                            
                         
                         return (
                         <tr key={`stockstyle${i}`}>
                             <td className="first-col">{obj['infos']['LegalName']}</td>
-                            {obj['stockStyle']["fund"]["prospectiveEarningsYield"] <0 ? 
-                                <td style={{color : `${red}`, width : '8.5%'}}>{obj['stockStyle']["fund"]["prospectiveEarningsYield"].toFixed(2)}</td> : 
-                                <td style={{color : `${green}`, width : '8.5%'}} >{obj['stockStyle']["fund"]["prospectiveEarningsYield"].toFixed(2)}</td>}
-
-                            {obj['stockStyle']["fund"]["prospectiveBookValueYield"] <0 ? 
-                                <td style={{color : `${red}`, width : '8.5%'}}>{obj['stockStyle']["fund"]["prospectiveBookValueYield"].toFixed(2)}</td> : 
-                                <td style={{color : `${green}`, width : '8.5%'}} >{obj['stockStyle']["fund"]["prospectiveBookValueYield"].toFixed(2)}</td>}
                             
-                            {obj['stockStyle']["fund"]["prospectiveRevenueYield"] <0 ? 
-                                <td style={{color : `${red}`, width : '8.5%'}}>{obj['stockStyle']["fund"]["prospectiveRevenueYield"].toFixed(2)}</td> : 
-                                <td style={{color : `${green}`, width : '8.5%'}} >{obj['stockStyle']["fund"]["prospectiveRevenueYield"].toFixed(2)}</td>}
+                            {(prospectiveEarningsYield !== null ) ? 
+                                <td style={{color : `${prospectiveEarningsYieldColor}`, width : '8.5%'}}>{prospectiveEarningsYield.toFixed(2)}</td> : 
+                                null}
 
-                            {obj['stockStyle']["fund"]["prospectiveCashFlowYield"] <0 ? 
-                                <td style={{color : `${red}`, width : '8.5%'}}>{obj['stockStyle']["fund"]["prospectiveCashFlowYield"].toFixed(2)}</td> : 
-                                <td style={{color : `${green}`, width : '8.5%'}} >{obj['stockStyle']["fund"]["prospectiveCashFlowYield"].toFixed(2)}</td>}
+                            {(prospectiveBookValueYield !== null ) ? 
+                                                            <td style={{color : `${prospectiveBookValueYieldColor}`, width : '8.5%'}}>{prospectiveBookValueYield.toFixed(2)}</td> : 
+                                                            null}
 
-                            {obj['stockStyle']["fund"]["prospectiveDividendYield"] <0 ? 
-                                <td style={{color : `${red}`, width : '8.5%'}}>{obj['stockStyle']["fund"]["prospectiveDividendYield"].toFixed(2)}</td> : 
-                                <td style={{color : `${green}`, width : '8.5%'}} >{obj['stockStyle']["fund"]["prospectiveDividendYield"].toFixed(2)}</td>}
+                            {(prospectiveRevenueYield !== null ) ? 
+                                                            <td style={{color : `${prospectiveRevenueYieldColor}`, width : '8.5%'}}>{prospectiveRevenueYield.toFixed(2)}</td> : 
+                                                            null}
+                                                        
+                            {(prospectiveCashFlowYield !== null ) ? 
+                                <td style={{color : `${prospectiveCashFlowYieldColor}`, width : '8.5%'}}>{prospectiveCashFlowYield.toFixed(2)}</td> : 
+                                null}
 
-                            {obj['stockStyle']["fund"]["forecasted5YearEarningsGrowth"] <0 ? 
-                                <td style={{color : `${red}`, width : '8.5%'}}>{obj['stockStyle']["fund"]["forecasted5YearEarningsGrowth"].toFixed(2)}</td> : 
-                                <td style={{color : `${green}`, width : '8.5%'}} >{obj['stockStyle']["fund"]["forecasted5YearEarningsGrowth"].toFixed(2)}</td>}
-                            
-                            {obj['stockStyle']["fund"]["forecastedEarningsGrowth"] <0 ? 
-                                <td style={{color : `${red}`, width : '8.5%'}}>{obj['stockStyle']["fund"]["forecastedEarningsGrowth"].toFixed(2)}</td> : 
-                                <td style={{color : `${green}`, width : '8.5%'}} >{obj['stockStyle']["fund"]["forecastedEarningsGrowth"].toFixed(2)}</td>}
+                            {(prospectiveDividendYield !== null ) ? 
+                                                            <td style={{color : `${prospectiveDividendYieldColor}`, width : '8.5%'}}>{prospectiveDividendYield.toFixed(2)}</td> : 
+                                                            null}
+                            {(forecasted5YearEarningsGrowth !== null ) ? 
+                                <td style={{color : `${forecasted5YearEarningsGrowthColor}`, width : '8.5%'}}>{forecasted5YearEarningsGrowth.toFixed(2)}</td> : 
+                                null}
 
-                            {obj['stockStyle']["fund"]["forecastedBookValueGrowth"] <0 ? 
-                                <td style={{color : `${red}`, width : '8.5%'}}>{obj['stockStyle']["fund"]["forecastedBookValueGrowth"].toFixed(2)}</td> : 
-                                <td style={{color : `${green}`, width : '8.5%'}} >{obj['stockStyle']["fund"]["forecastedBookValueGrowth"].toFixed(2)}</td>}
+                            {(forecastedEarningsGrowth !== null ) ? 
+                                                            <td style={{color : `${forecastedEarningsGrowthColor}`, width : '8.5%'}}>{forecastedEarningsGrowth.toFixed(2)}</td> : 
+                                                            null}
 
-                            {obj['stockStyle']["fund"]["forecastedRevenueGrowth"] <0 ? 
-                                <td style={{color : `${red}`, width : '8.5%'}}>{obj['stockStyle']["fund"]["forecastedRevenueGrowth"].toFixed(2)}</td> : 
-                                <td style={{color : `${green}`, width : '8.5%'}} >{obj['stockStyle']["fund"]["forecastedRevenueGrowth"].toFixed(2)}</td>}
-                            
-                            {obj['stockStyle']["fund"]["forecastedCashFlowGrowth"] <0 ? 
-                                <td style={{color : `${red}`, width : '8.5%'}}>{obj['stockStyle']["fund"]["forecastedCashFlowGrowth"].toFixed(2)}</td> : 
-                                <td style={{color : `${green}`, width : '8.5%'}} >{obj['stockStyle']["fund"]["forecastedCashFlowGrowth"].toFixed(2)}</td>}
-                            
-                            
-                            
+                            {(forecastedBookValueGrowth !== null ) ? 
+                                                            <td style={{color : `${forecastedBookValueGrowthColor}`, width : '8.5%'}}>{forecastedBookValueGrowth.toFixed(2)}</td> : 
+                                                            null}
+                            {(forecastedRevenueGrowth !== null ) ? 
+                                <td style={{color : `${forecastedRevenueGrowthColor}`, width : '8.5%'}}>{forecastedRevenueGrowth.toFixed(2)}</td> : 
+                                null}
+
+                            {(forecastedCashFlowGrowth !== null ) ? 
+                                <td style={{color : `${forecastedCashFlowGrowthColor}`, width : '8.5%'}}>{forecastedCashFlowGrowth.toFixed(2)}</td> : 
+                                null}
+
 
                             
                         </tr>
@@ -1158,6 +1238,7 @@ const Funds = () => {
                     && Object.getPrototypeOf(obj) === Object.prototype){
                         //pass
                     } else {
+                        if ("equityHoldingPage" in obj['positions']) {
                         if (obj['positions']["equityHoldingPage"]["numberOfAllHolding"] !==0) {
 
                             
@@ -1198,7 +1279,7 @@ const Funds = () => {
                                     </table>
                                 </div>
 
-                            )}
+                            )}}
 
 
                      }
@@ -1217,6 +1298,7 @@ const Funds = () => {
                     && Object.getPrototypeOf(obj) === Object.prototype){
                         //pass
                     } else {
+                        if ("boldHoldingPage" in obj['positions']) {
                         if (obj['positions']["boldHoldingPage"]["numberOfAllHolding"] !==0) {
                             
                             return (
@@ -1256,7 +1338,7 @@ const Funds = () => {
                                 </div>
 
                                 )
-                    }
+                    }}
 
 
                      } 
@@ -1277,6 +1359,7 @@ const Funds = () => {
                     && Object.getPrototypeOf(obj) === Object.prototype){
                         //pass
                     } else {
+                        if ("otherHoldingPage" in obj['positions']) {
                         if (obj['positions']["otherHoldingPage"]["numberOfAllHolding"] !==0) {
                             
                             return (
@@ -1316,7 +1399,7 @@ const Funds = () => {
                                 </div>
 
                                 )
-                    }
+                    }}
 
 
                      } 
@@ -2548,7 +2631,7 @@ const Funds = () => {
 
     return (
         <div align='center' className="mt-4">
-            <h1>Analyse de portefeuilles</h1>
+            <h1>Analyse de fonds</h1>
             {inputPortfolioListBis()}
             
             {buttonAddInputPort()}

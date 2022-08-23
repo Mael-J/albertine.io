@@ -529,12 +529,19 @@ class REPORT(COLOR):
             story.append(position_title)
             story.append(FrameBreak())
             #fund date
-            story.append(self.paragraph_date(parser.parse(data['positions']['holdingSummary']['portfolioDate'])))
-            story.append(FrameBreak())
+            if 'holdingSummary' in data['positions']:
+
+                story.append(self.paragraph_date(parser.parse(data['positions']['holdingSummary']['portfolioDate'])))
+                story.append(FrameBreak())
+            else:
+
+                story.append(FrameBreak())
             #positions
-            story.append(self.table_position(data,200*mm,80*mm))
-            
-            story.append(FrameBreak())
+            if 'boldHoldingPage' in data['positions']:
+                story.append(self.table_position(data,200*mm,80*mm))
+                story.append(FrameBreak())
+            else:
+                story.append(FrameBreak())
             
 
             #charts
@@ -1717,26 +1724,84 @@ class REPORT(COLOR):
 
     def table_equity_style(self, obj,w,h):
         """table equity style"""
+
+        if obj['stockStyle']["fund"]["prospectiveEarningsYield"] != None:
+            prospectiveEarningsYield = "{:.2f}".format(obj['stockStyle']["fund"]["prospectiveEarningsYield"]).replace('.', ',')
+        else:
+            prospectiveEarningsYield = None
+
+
+        if obj['stockStyle']["fund"]["prospectiveBookValueYield"] != None:
+            prospectiveBookValueYield = "{:.2f}".format(obj['stockStyle']["fund"]["prospectiveBookValueYield"]).replace('.', ',')
+        else:
+            prospectiveBookValueYield = None
+
+        if obj['stockStyle']["fund"]["prospectiveRevenueYield"] != None:
+            prospectiveRevenueYield = "{:.2f}".format(obj['stockStyle']["fund"]["prospectiveRevenueYield"]).replace('.', ',')
+        else:
+            prospectiveRevenueYield = None
+
+        if obj['stockStyle']["fund"]["prospectiveCashFlowYield"] != None:
+            prospectiveCashFlowYield = "{:.2f}".format(obj['stockStyle']["fund"]["prospectiveCashFlowYield"]).replace('.', ',')
+        else:
+            prospectiveCashFlowYield = None
+
+        if obj['stockStyle']["fund"]["prospectiveDividendYield"] != None:
+            prospectiveDividendYield = "{:.2f}".format(obj['stockStyle']["fund"]["prospectiveDividendYield"]).replace('.', ',')
+        else:
+            prospectiveDividendYield = None
+
+        if obj['stockStyle']["fund"]["forecasted5YearEarningsGrowth"] != None:
+            forecasted5YearEarningsGrowth = "{:.2f}".format(obj['stockStyle']["fund"]["forecasted5YearEarningsGrowth"]).replace('.', ',')
+        else:
+            forecasted5YearEarningsGrowth = None
+
+
+        if obj['stockStyle']["fund"]["forecastedEarningsGrowth"] != None:
+            forecastedEarningsGrowth = "{:.2f}".format(obj['stockStyle']["fund"]["forecastedEarningsGrowth"]).replace('.', ',')
+        else:
+            forecastedEarningsGrowth = None
+
+
+        if obj['stockStyle']["fund"]["forecastedBookValueGrowth"] != None:
+            forecastedBookValueGrowth = "{:.2f}".format(obj['stockStyle']["fund"]["forecastedBookValueGrowth"]).replace('.', ',')
+        else:
+            forecastedBookValueGrowth = None
+
+        if obj['stockStyle']["fund"]["forecastedRevenueGrowth"] != None:
+            forecastedRevenueGrowth = "{:.2f}".format(obj['stockStyle']["fund"]["forecastedRevenueGrowth"]).replace('.', ',')
+        else:
+            forecastedRevenueGrowth = None
+
+        if obj['stockStyle']["fund"]["forecastedCashFlowGrowth"] != None:
+            forecastedCashFlowGrowth = "{:.2f}".format(obj['stockStyle']["fund"]["forecastedCashFlowGrowth"]).replace('.', ',')
+        else:
+            forecastedCashFlowGrowth = None
+
+        
+
+
+
         data = [["Rendement \nbénéfices",
         "Rendement \nvaleur comptable","Rendement \nchiffre d'affaires",
         "Rendement \ncash flow",	"Taux \ndividende",
        ],
-        ["{:.2f}".format(obj['stockStyle']["fund"]["prospectiveEarningsYield"]).replace('.', ','),
-        "{:.2f}".format(obj['stockStyle']["fund"]["prospectiveBookValueYield"]).replace('.', ','),
-        "{:.2f}".format(obj['stockStyle']["fund"]["prospectiveRevenueYield"]).replace('.', ','),
-        "{:.2f}".format(obj['stockStyle']["fund"]["prospectiveCashFlowYield"]).replace('.', ','),
-        "{:.2f}".format(obj['stockStyle']["fund"]["prospectiveDividendYield"]).replace('.', ','),
+        [prospectiveEarningsYield,
+        prospectiveBookValueYield,
+        prospectiveRevenueYield,
+        prospectiveCashFlowYield,
+        prospectiveDividendYield,
 
         ], [
         "Croissance \nbénéfices 5 ans",	
         "Croissance \nbénéfices",	"Croissance \nvaleur comptable",
         "Croissance \nchiffre d'affaires",	"Croissance \ncash flow"
         ], [
-        "{:.2f}".format(obj['stockStyle']["fund"]["forecasted5YearEarningsGrowth"]).replace('.', ','),
-        "{:.2f}".format(obj['stockStyle']["fund"]["forecastedEarningsGrowth"]).replace('.', ','),
-        "{:.2f}".format(obj['stockStyle']["fund"]["forecastedBookValueGrowth"]).replace('.', ','),
-        "{:.2f}".format(obj['stockStyle']["fund"]["forecastedRevenueGrowth"]).replace('.', ','),
-        "{:.2f}".format(obj['stockStyle']["fund"]["forecastedCashFlowGrowth"]).replace('.', ',')
+        forecasted5YearEarningsGrowth,
+        forecastedEarningsGrowth,
+        forecastedBookValueGrowth,
+        forecastedRevenueGrowth,
+        forecastedCashFlowGrowth
 
         ]
         ]
@@ -1754,57 +1819,67 @@ class REPORT(COLOR):
                                 ('BOTTOMPADDING',(0,0),(-1,-1),0),
                                 ('LEFTPADDING',(0,0),(-1,-1),6),
                                 ('RIGHTPADDING',(0,0),(-1,-1),6)]
+        if prospectiveEarningsYield != None: 
+            if obj['stockStyle']["fund"]["prospectiveEarningsYield"] < 0:
+                    style.append(('TEXTCOLOR', (0,1),(0,1),self.red))
+            else:
+                    style.append(('TEXTCOLOR', (0,1),(0,1),self.green))
 
-        if obj['stockStyle']["fund"]["prospectiveEarningsYield"] < 0:
-                style.append(('TEXTCOLOR', (0,1),(0,1),self.red))
-        else:
-                style.append(('TEXTCOLOR', (0,1),(0,1),self.green))
+        if prospectiveBookValueYield != None: 
+            if obj['stockStyle']["fund"]["prospectiveBookValueYield"] < 0:
+                    style.append(('TEXTCOLOR', (1,1),(1,1),self.red))
+            else:
+                    style.append(('TEXTCOLOR', (1,1),(1,1),self.green))
 
-        if obj['stockStyle']["fund"]["prospectiveBookValueYield"] < 0:
-                style.append(('TEXTCOLOR', (1,1),(1,1),self.red))
-        else:
-                style.append(('TEXTCOLOR', (1,1),(1,1),self.green))
+        if prospectiveRevenueYield != None:
+            if obj['stockStyle']["fund"]["prospectiveRevenueYield"] < 0:
+                    style.append(('TEXTCOLOR', (2,1),(2,1),self.red))
+            else:
+                    style.append(('TEXTCOLOR', (2,1),(2,1),self.green))
 
-        if obj['stockStyle']["fund"]["prospectiveRevenueYield"] < 0:
-                style.append(('TEXTCOLOR', (2,1),(2,1),self.red))
-        else:
-                style.append(('TEXTCOLOR', (2,1),(2,1),self.green))
 
-        if obj['stockStyle']["fund"]["prospectiveCashFlowYield"] < 0:
-                style.append(('TEXTCOLOR', (3,1),(3,1),self.red))
-        else:
-                style.append(('TEXTCOLOR', (3,1),(3,1),self.green))
+        if prospectiveCashFlowYield != None:
+            if obj['stockStyle']["fund"]["prospectiveCashFlowYield"] < 0:
+                    style.append(('TEXTCOLOR', (3,1),(3,1),self.red))
+            else:
+                    style.append(('TEXTCOLOR', (3,1),(3,1),self.green))
 
-        if obj['stockStyle']["fund"]["prospectiveDividendYield"]< 0:
-                style.append(('TEXTCOLOR', (4,1),(4,1),self.red))
-        else:
-                style.append(('TEXTCOLOR', (4,1),(4,1),self.green))
+        if prospectiveDividendYield != None:
+            if obj['stockStyle']["fund"]["prospectiveDividendYield"] < 0:
+                    style.append(('TEXTCOLOR', (4,1),(4,1),self.red))
+            else:
+                    style.append(('TEXTCOLOR', (4,1),(4,1),self.green))
 
-        if obj['stockStyle']["fund"]["forecasted5YearEarningsGrowth"]< 0:
-                style.append(('TEXTCOLOR', (0,3),(0,3),self.red))
-        else:
-                style.append(('TEXTCOLOR', (0,3),(0,3),self.green))
 
-        if obj['stockStyle']["fund"]["forecastedEarningsGrowth"]< 0:
-                style.append(('TEXTCOLOR', (1,3),(1,3),self.red))
-        else:
-                style.append(('TEXTCOLOR', (1,3),(1,3),self.green))
+        if forecasted5YearEarningsGrowth != None:
+            if obj['stockStyle']["fund"]["forecasted5YearEarningsGrowth"] < 0:
+                    style.append(('TEXTCOLOR', (0,3),(0,3),self.red))
+            else:
+                    style.append(('TEXTCOLOR', (0,3),(0,3),self.green))
 
-        if obj['stockStyle']["fund"]["forecastedBookValueGrowth"]< 0:
-                style.append(('TEXTCOLOR', (2,3),(2,3),self.red))
-        else:
-                style.append(('TEXTCOLOR', (2,3),(2,3),self.green))
+        if forecastedEarningsGrowth != None:
+            if obj['stockStyle']["fund"]["forecastedEarningsGrowth"] < 0:
+                    style.append(('TEXTCOLOR', (1,3),(1,3),self.red))
+            else:
+                    style.append(('TEXTCOLOR', (1,3),(1,3),self.green))
 
-        
-        if obj['stockStyle']["fund"]["forecastedRevenueGrowth"]< 0:
-                style.append(('TEXTCOLOR', (3,3),(3,3),self.red))
-        else:
-                style.append(('TEXTCOLOR', (3,3),(3,3),self.green))
+        if forecastedBookValueGrowth != None:
+            if obj['stockStyle']["fund"]["forecastedBookValueGrowth"] < 0:
+                    style.append(('TEXTCOLOR', (2,3),(2,3),self.red))
+            else:
+                    style.append(('TEXTCOLOR', (2,3),(2,3),self.green))
 
-        if obj['stockStyle']["fund"]["forecastedCashFlowGrowth"]< 0:
-                style.append(('TEXTCOLOR', (4,3),(4,3),self.red))
-        else:
-                style.append(('TEXTCOLOR', (4,3),(4,3),self.green))
+        if forecastedRevenueGrowth != None:
+            if obj['stockStyle']["fund"]["forecastedRevenueGrowth"] < 0:
+                    style.append(('TEXTCOLOR', (3,3),(3,3),self.red))
+            else:
+                    style.append(('TEXTCOLOR', (3,3),(3,3),self.green))
+
+        if forecastedCashFlowGrowth !=None:
+            if obj['stockStyle']["fund"]["forecastedCashFlowGrowth"] < 0:
+                    style.append(('TEXTCOLOR', (4,3),(4,3),self.red))
+            else:
+                    style.append(('TEXTCOLOR', (4,3),(4,3),self.green))
 
         table_style = TableStyle(style)
 
@@ -1937,12 +2012,31 @@ class REPORT(COLOR):
 
     def table_cumulative_performance(self,obj,w,h):
         """table cumulative performance"""
+
+        #10 years
+        if "fund_cumulative_performance_10 ans (annualisée)"  in obj['pages']:
+            ann_10Y = obj['pages']["fund_cumulative_performance_10 ans (annualisée)"]
+        else:
+            ann_10Y = "-"
+
+        #5 years
+        if "fund_cumulative_performance_5 ans (annualisée)"  in obj['pages']:
+            ann_5Y = obj['pages']["fund_cumulative_performance_5 ans (annualisée)"]
+        else:
+            ann_5Y = "-"
+
+        #3 years
+        if "fund_cumulative_performance_3 ans (annualisée)"  in obj['pages']:
+            ann_3Y = obj['pages']["fund_cumulative_performance_3 ans (annualisée)"]
+        else:
+            ann_3Y = "-"
+
         data = [["Début \nde l'année",	"1 jour",	"1 semaine",	"1 mois",	"3 mois",	"6 mois",	"1 an",	"3 ans \nannualisé",	"5 ans \nannualisé",	"10 ans \nannualisé"],
         [obj['pages']["fund_cumulative_performance_Début d'année"],obj['pages']["fund_cumulative_performance_1 jour"],
         obj['pages']["fund_cumulative_performance_1 semaine"],obj['pages']["fund_cumulative_performance_1 mois"],
         obj['pages']["fund_cumulative_performance_3 mois"], obj['pages']["fund_cumulative_performance_6 mois"],
-        obj['pages']["fund_cumulative_performance_1 an"], obj['pages']["fund_cumulative_performance_3 ans (annualisée)"],
-        obj['pages']["fund_cumulative_performance_5 ans (annualisée)"], obj['pages']["fund_cumulative_performance_10 ans (annualisée)"]
+        obj['pages']["fund_cumulative_performance_1 an"], ann_3Y,
+        ann_5Y, ann_10Y
         ]
         ]
         #0 column, 1 row
@@ -2008,23 +2102,23 @@ class REPORT(COLOR):
         else:
             style.append(('TEXTCOLOR', (6,1),(6,1),self.green))
 
-        if obj['pages']["fund_cumulative_performance_3 ans (annualisée)"] == '-':
+        if ann_3Y == '-':
             style.append(('TEXTCOLOR', (7,1),(7,1),self.black))
-        elif obj['pages']["fund_cumulative_performance_3 ans (annualisée)"][:1]  =='-':
+        elif ann_3Y  =='-':
             style.append(('TEXTCOLOR', (7,1),(7,1),self.red))
         else:
             style.append(('TEXTCOLOR', (7,1),(7,1),self.green))
 
-        if obj['pages']["fund_cumulative_performance_5 ans (annualisée)"] == '-':
+        if ann_5Y == '-':
             style.append(('TEXTCOLOR', (8,1),(8,1),self.black))
-        elif obj['pages']["fund_cumulative_performance_5 ans (annualisée)"][:1]  =='-':
+        elif ann_5Y  =='-':
             style.append(('TEXTCOLOR', (8,1),(8,1),self.red))
         else:
             style.append(('TEXTCOLOR', (8,1),(8,1),self.green))
 
-        if obj['pages']["fund_cumulative_performance_10 ans (annualisée)"] == '-':
+        if ann_10Y == '-':
             style.append(('TEXTCOLOR', (9,1),(9,1),self.black))
-        elif obj['pages']["fund_cumulative_performance_10 ans (annualisée)"][:1]  =='-':
+        elif ann_10Y  =='-':
             style.append(('TEXTCOLOR', (9,1),(9,1),self.red))
         else:
             style.append(('TEXTCOLOR', (9,1),(9,1),self.green))
