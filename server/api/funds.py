@@ -1,13 +1,14 @@
 from flask import Blueprint, jsonify, request, send_file
 from pandas.core.frame import DataFrame
-from calculation.ms_scraping import fund_info, get_bearer_token, scrape_page, get_position, get_marketCap, get_sector, get_creditQuality, get_stockStyle, get_fixedIncomeStyle, get_esgData, get_carbonMetrics
-from myclass.report import REPORT, REPORTCANVA, REPORTCANVA2
+from calculation.ms_scraping import scrape_page
+from myclass.report import REPORT
 from investpy.utils.extra import random_user_agent
 import requests
 import json
 import pandas as pd
 from io import BytesIO
-import os
+from mstarpy import Funds, search_funds
+import numpy as np
 
 
 # prefix of the route
@@ -15,14 +16,6 @@ prefix = "/api/funds"
 
 funds = Blueprint('funds',__name__)
 
-proxy_dict = {
-                'https': "http://10.118.4.13:8086",
-                'http': "http://10.118.4.13:8086",
-                  
-                  }
-@funds.route("%s/test" % (prefix), methods = ["GET"])
-def test_api():
-  return jsonify({"HELLO" : "world"}), 200
 
 @funds.route("%s/download/pdf" % (prefix), methods = ["POST"])
 def download_pdf():
@@ -226,7 +219,6 @@ def download_excel():
         df_holdings = pd.concat([df_buffer, df_holdings])
 
     #blob
-    # output =os.path.abspath(os.path.join(os.path.dirname( '__file__' ),'static/media', "albertine_letempsretrouve.xlsx"))
     # print(output)
     output = BytesIO()
     #to excel
@@ -265,33 +257,66 @@ def download_excel():
 
 
 
-@funds.route("%s/info/<code>" % (prefix), methods = ['GET'])
-def get_info(code):
-    """get info about funds"""
-    #get bearer token for authorization
-    bearer = get_bearer_token(code, proxy_dict = proxy_dict)
+@funds.route("%s/historicaldata" % (prefix), methods = ['GET'])
+def get_data():
+  """get historical data"""
+  code_str = request.args.get('code')
+  code_list = json.loads(code_str)
+  df = pd.DataFrame()
+  
+  for code in code_list:
+    funds = Funds(code["value"])
+    data = funds.historicalData()
+    df_funds = pd.DataFrame(data["graphData"]["fund"])
+    df_funds = df_funds.rename(columns= {"value" : f"{funds.name}"})
+    if df.empty:
+        df = df_funds
+    else:
+        df = df.merge(df_funds, how = 'inner', on ='date', )
+  df = df.set_index("date")
+  df = (df/df.shift(1)-1).fillna(0)
+  df = round(100*np.cumprod(1+df),2)
+  df =df.reset_index()
+  
+  return df.to_json(orient='records')
 
+
+
+@funds.route("%s/currentdata" % (prefix), methods = ['GET'])
+def get_currentdata():
+  """get info about funds """
+
+  result_list = []
+  code_str = request.args.get('code')
+  code_list = json.loads(code_str)
+
+  for code in code_list:
+    funds = Funds(code["value"])
     #all info from screener
-    infos = fund_info(code,proxy_dict = proxy_dict)
+    infos_list = funds.dataPoint(['SecId',	'Name',	'PriceCurrency',	'TenforeId',	'LegalName',	'ClosePrice',	'StarRatingM255',	'SustainabilityRank',	'QuantitativeRating',	'AnalystRatingScale',	'CategoryName',	'Yield_M12',	'GBRReturnD1',	'GBRReturnW1',	'GBRReturnM1',	'GBRReturnM3',	'GBRReturnM6',	'GBRReturnM0',	'GBRReturnM12',	'GBRReturnM36',	'GBRReturnM60',	'GBRReturnM120',	'MaxFrontEndLoad',	'OngoingCostActual',	'PerformanceFeeActual',	'TransactionFeeActual',	'MaximumExitCostAcquired',	'FeeLevel',	'ManagerTenure',	'MaxDeferredLoad',	'InitialPurchase',	'FundTNAV',	'EquityStyleBox',	'BondStyleBox',	'AverageMarketCapital',	'AverageCreditQualityCode',	'EffectiveDuration',	'MorningstarRiskM255',	'AlphaM36',	'BetaM36',	'R2M36',	'StandardDeviationM36',	'SharpeM36',	'InvestorTypeRetail',	'InvestorTypeProfessional',	'InvestorTypeEligibleCounterparty',	'ExpertiseBasic',	'ExpertiseAdvanced',	'ExpertiseInformed',	'ReturnProfilePreservation',	'ReturnProfileGrowth',	'ReturnProfileIncome',	'ReturnProfileHedging',	'ReturnProfileOther',	'TrackRecordExtension',	'investmentObjective',	'investmentExpertise',	'investorType',	'investment',	'instrumentName',	'largestSector',	'globalAssetClassId',	'brandingCompanyId',	'categoryId',	'distribution',	'equityStyle',	'administratorCompanyId',	'fundSize',	'fundStyle',	'umbrellaCompanyId',	'geoRegion',	'globalCategoryId',	'investmentExpertise',	'managementStyle',	'ongoingCharge',	'riskSrri',	'shareClassType',	'starRating',	'sustainabilityRating',	'yieldPercent',	'totalReturnTimeFrame',	'totalReturn',	'iMASectorId',	'ReturnD1',	'ReturnW1',	'ReturnM1',	'ReturnM3',	'ReturnM6',	'ReturnM0',	'ReturnM12',	'ReturnM36',	'ReturnM60',	'ReturnM120',])
+    if infos_list:
+      infos = infos_list[0]
+    else:
+      infos = {}
     #info from pages
-    pages = scrape_page(code, proxy_dict = proxy_dict)
+    pages = scrape_page(code["value"])
     #position of the funds
-    positions= get_position(code,bearer, proxy_dict = proxy_dict)
+    positions= funds.position()
     #market cap
-    marketCap = get_marketCap(code,bearer, proxy_dict = proxy_dict)
+    marketCap = funds.marketCapitalization()
     #sector
-    sector = get_sector(code,bearer, proxy_dict = proxy_dict)
+    sector = funds.sector()
     #credit Quality
-    creditQuality = get_creditQuality(code,bearer, proxy_dict = proxy_dict)
+    creditQuality = funds.creditQuality()
     #stock style
-    stockStyle = get_stockStyle(code,bearer, proxy_dict = proxy_dict)
+    stockStyle = funds.equityStyle()
     #bonds style
-    bondStyle = get_fixedIncomeStyle(code,bearer, proxy_dict = proxy_dict)
+    bondStyle = funds.fixedIncomeStyle()
     #esg data
-    esgData = get_esgData(code,bearer, proxy_dict = proxy_dict)
+    esgData = funds.esgData()
 
     #carbon metrics
-    carbonMetrics = get_carbonMetrics(code,bearer, proxy_dict = proxy_dict)
+    carbonMetrics = funds.carbonMetrics()
 
     #number of bonds
     if 'numberOfBondHolding' in positions:
@@ -316,7 +341,69 @@ def get_info(code):
               'marketCap': marketCap,'sector' : sector,
               'creditQuality' : creditQuality,'stockStyle' : stockStyle, 'bondStyle' : bondStyle,
               'esgData' : esgData, 'carbonMetrics' : carbonMetrics, 'numberOfBondHolding' : numberOfBondHolding,
-              'numberOfEquityHolding': numberOfEquityHolding, 'numberOfOtherHolding': numberOfOtherHolding
+              'numberOfEquityHolding': numberOfEquityHolding, 'numberOfOtherHolding': numberOfOtherHolding,
+              
+              }
+    result_list.append(result)
+  return result_list
+
+@funds.route("%s/info/<code>" % (prefix), methods = ['GET'])
+def get_info(code):
+    """get info about funds"""
+
+    funds = Funds(code)
+
+    #all info from screener
+    infos_list = funds.dataPoint(['SecId',	'Name',	'PriceCurrency',	'TenforeId',	'LegalName',	'ClosePrice',	'StarRatingM255',	'SustainabilityRank',	'QuantitativeRating',	'AnalystRatingScale',	'CategoryName',	'Yield_M12',	'GBRReturnD1',	'GBRReturnW1',	'GBRReturnM1',	'GBRReturnM3',	'GBRReturnM6',	'GBRReturnM0',	'GBRReturnM12',	'GBRReturnM36',	'GBRReturnM60',	'GBRReturnM120',	'MaxFrontEndLoad',	'OngoingCostActual',	'PerformanceFeeActual',	'TransactionFeeActual',	'MaximumExitCostAcquired',	'FeeLevel',	'ManagerTenure',	'MaxDeferredLoad',	'InitialPurchase',	'FundTNAV',	'EquityStyleBox',	'BondStyleBox',	'AverageMarketCapital',	'AverageCreditQualityCode',	'EffectiveDuration',	'MorningstarRiskM255',	'AlphaM36',	'BetaM36',	'R2M36',	'StandardDeviationM36',	'SharpeM36',	'InvestorTypeRetail',	'InvestorTypeProfessional',	'InvestorTypeEligibleCounterparty',	'ExpertiseBasic',	'ExpertiseAdvanced',	'ExpertiseInformed',	'ReturnProfilePreservation',	'ReturnProfileGrowth',	'ReturnProfileIncome',	'ReturnProfileHedging',	'ReturnProfileOther',	'TrackRecordExtension',	'investmentObjective',	'investmentExpertise',	'investorType',	'investment',	'instrumentName',	'largestSector',	'globalAssetClassId',	'brandingCompanyId',	'categoryId',	'distribution',	'equityStyle',	'administratorCompanyId',	'fundSize',	'fundStyle',	'umbrellaCompanyId',	'geoRegion',	'globalCategoryId',	'investmentExpertise',	'managementStyle',	'ongoingCharge',	'riskSrri',	'shareClassType',	'starRating',	'sustainabilityRating',	'yieldPercent',	'totalReturnTimeFrame',	'totalReturn',	'iMASectorId',	'ReturnD1',	'ReturnW1',	'ReturnM1',	'ReturnM3',	'ReturnM6',	'ReturnM0',	'ReturnM12',	'ReturnM36',	'ReturnM60',	'ReturnM120',])
+    if infos_list:
+      infos = infos_list[0]
+    else:
+      infos = {}
+    #info from pages
+    pages = scrape_page(code)
+    #position of the funds
+    positions= funds.position()
+    #market cap
+    marketCap = funds.marketCapitalization()
+    #sector
+    sector = funds.sector()
+    #credit Quality
+    creditQuality = funds.creditQuality()
+    #stock style
+    stockStyle = funds.equityStyle()
+    #bonds style
+    bondStyle = funds.fixedIncomeStyle()
+    #esg data
+    esgData = funds.esgData()
+
+    #carbon metrics
+    carbonMetrics = funds.carbonMetrics()
+
+    #number of bonds
+    if 'numberOfBondHolding' in positions:
+      numberOfBondHolding = positions["numberOfBondHolding"]
+    else:
+      numberOfBondHolding = 0
+
+    #number of equities
+    if 'numberOfEquityHolding' in positions:
+      numberOfEquityHolding = positions["numberOfEquityHolding"]
+    else:
+      numberOfEquityHolding = 0
+
+    #number of other holdings
+    if 'numberOfOtherHolding' in positions:
+      numberOfOtherHolding = positions["numberOfOtherHolding"]
+    else:
+      numberOfOtherHolding = 0
+    
+
+    result = {'infos': infos, 'pages' : pages, 'positions': positions, 
+              'marketCap': marketCap,'sector' : sector,
+              'creditQuality' : creditQuality,'stockStyle' : stockStyle, 'bondStyle' : bondStyle,
+              'esgData' : esgData, 'carbonMetrics' : carbonMetrics, 'numberOfBondHolding' : numberOfBondHolding,
+              'numberOfEquityHolding': numberOfEquityHolding, 'numberOfOtherHolding': numberOfOtherHolding,
+              
               }
   
     return jsonify(result), 200
@@ -325,51 +412,26 @@ def get_info(code):
 @funds.route("%s/fundlist/<term>" % (prefix), methods = ['GET'])
 def get_fund_list(term):
     """get list of funds based on user input"""
-
-
-    #url
-    url = "https://tools.morningstar.co.uk/api/rest.svc/klr5zyak8x/security/screener"
-  
-    params = {
-    'page' : 1,
-    'pageSize' : 10,
-    'sortOrder' : 'LegalName asc',
-    'outputType' : 'json',
-    'version' : 1,
-    'languageId' : 'fr-FR',
-    'currencyId' : 'EUR',
-    'universeIds' : 'FOFRA$$ALL',
-    'securityDataPoints' : 'SecId|TenforeId|LegalName',
-    'term' : term,
-    }
-
-    #headers
-    headers = {
-                'user-agent': random_user_agent(),
-                }   
-
-    response = requests.get(url,params=params, headers=headers, proxies=proxy_dict)
-    if response.status_code == 200:
-      result =json.loads(response.content.decode())
-      if result:
-        rows = result['rows']
-        #rows to df
-        df = pd.DataFrame(rows)
-        #correction isin code
-        df['TenforeId'] =df['TenforeId'].str[-12:]
-        #label is name + isin
-        df['label'] = df['LegalName'] + ' : ' + df['TenforeId']
-        #value is secid
-        df = df.rename(columns={'SecId' : 'value'})
-        #keep only value and label
-        df = df[['value', 'label']]
-        #convert DataFrame to json
-        result = df.to_json(orient='records')
-      else:
-        result = {}
-        
+    funds_list = search_funds(term,["SecId","TenforeId","LegalName"])
+    
+    if funds_list :
+      #rows to df
+      df = pd.DataFrame(funds_list)
+      
+      #correction isin code
+      df['TenforeId'] =df['TenforeId'].str[-12:]
+      #label is name + isin 
+      df['label'] = df['LegalName'] + ' : ' + df['TenforeId']
+      #if TenforeIddoes not exist replace by sec id
+      df['label'] = df['label'].fillna(df['LegalName'] + ' : ' + df['SecId'])
+      #value is secid
+      df = df.rename(columns={'SecId' : 'value'})
+      #keep only value and label
+      df = df[['value', 'label']]
+      #convert DataFrame to json
+      result = df.to_json(orient='records')
     else:
-      print(response)
-      result = {}
+      result = [{}]
+      
     return result
 

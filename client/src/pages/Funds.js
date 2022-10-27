@@ -5,7 +5,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import '../CSS/Funds.css'
 import Select from 'react-select';
 import Loading from '../utils/image/loading2.svg';
-import { BarChart, Bar, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 // const baseURL = 'http://localhost:4000/api/funds';
 
 //const baseURL = 'http://jtpnrui.cluster030.hosting.ovh.net/api/funds';
@@ -50,6 +50,7 @@ const Funds = () => {
         {name : 'petite'},
         {name : 'micro'},]);
 
+    const [histoData, setHistoData] = useState([])
     //sector data
     const [sectorData, setSectorData] = useState([
         {name : "Conso. discrétionnaire"},
@@ -246,26 +247,47 @@ const Funds = () => {
             setFundIsLoading(false);
         }
         
-        portfolios.map((funds, i) => {
-            if (funds !==null){
-                setFundIsLoading(true);
+        // portfolios.map((funds, i) => {
+        //     if (funds !==null){
+        //         setFundIsLoading(true);
                 
-                fetch(`/api/funds/info/${funds['value']}`).then(
-                    response => {
-                        return response.json()
-                    }
-                ).then(response => {
-                    //portInfos[i] = response;
+        //         fetch(`/api/funds/info/${funds['value']}`).then(
+        //             response => {
+        //                 return response.json()
+        //             }
+        //         ).then(response => {
+        //             //portInfos[i] = response;
                     
-                    setPortInfos(prev => [...prev, response]);
+        //             setPortInfos(prev => [...prev, response]);
                     
-                    //fetching is done
-                    setFundIsLoading(false);
-                }).catch(error => {
-                    console.error(error.message);
-                })
-            }
-        });
+                    
+        //             //fetching is done
+        //             setFundIsLoading(false);
+        //         }).catch(error => {
+        //             console.error(error.message);
+        //         })
+        //     }
+        // });
+
+        fetch(`/api/funds/currentdata?code=${JSON.stringify(portfolios)}`).then(response => {
+            return response.json();
+        }).then(response => {
+            setPortInfos(response);
+                console.log(response);
+                //fetching is done
+                 setFundIsLoading(false);
+            }).catch(error => {
+                console.error(error.message);
+            });
+
+        fetch(`/api/funds/historicaldata?code=${JSON.stringify(portfolios)}`).then(response => {
+            return response.json();
+        }).then(response => {
+                setHistoData(response);
+                console.log(response);
+            }).catch(error => {
+                console.error(error.message);
+            });
 
     }
     const modifyPortfolioBis = (listFunds) => {
@@ -658,7 +680,38 @@ const Funds = () => {
                         </table>
             </div>
             </div>
-            <div className="mt-4">
+            <div className="mt-2">
+            <h2>Performance (base 100)</h2>
+                <LineChart
+                    width={500}
+                    height={500}
+                    data={histoData}
+                    margin={{
+                    top: 5,
+                    right: 30,
+                    left: 20,
+                    bottom: 5,
+                    }}>
+                    <XAxis dataKey="date"  angle={-45} textAnchor="end" height={120} />
+                    <YAxis domain={['auto', 'auto']}/>
+                    <Tooltip />
+                    <Legend />
+                    {portInfos.map((obj, i) => {
+                    if (obj // 👈 null and undefined check
+                    && Object.keys(obj).length === 0
+                    && Object.getPrototypeOf(obj) === Object.prototype){
+                        //pass
+                    } else {
+                        return(
+                        <Line type="monotone" dataKey={obj['infos']['LegalName']} stroke={graphColor[i]} dot={false} />)
+                        
+                    }
+                    })}
+
+
+                </LineChart>
+            </div>
+            <div className="mt-2">
                 <h2>Performance</h2>
                 <div className=" frame-text">
                     <div className="sub-title">Performance cumulée (en %)</div>
@@ -1408,6 +1461,7 @@ const Funds = () => {
                 :<div></div>}
 
             </div>
+
             <div className="mt-4">
             {portInfos.reduce((n, {numberOfEquityHolding}) => n + numberOfEquityHolding, 0) > 0 ?
             <div style = {{display : "inline-grid"}}>

@@ -5,6 +5,8 @@ import requests
 import json
 from bs4 import BeautifulSoup
 import re
+from mstarpy import Funds, search_funds
+import numpy as np
 
 
 
@@ -525,7 +527,17 @@ def get_position(code, bearerToken, proxy_dict = None):
     return result
 
 
-def scrape_page(funds_code, proxy_dict = None):
+def historicalData(loaded_funds):
+    """get historical data of loaded funds"""
+    data =loaded_funds.historicalData()
+    df = pd.DataFrame(data["graphData"]["fund"])
+    #df["date"] =pd.to_datetime(df["date"])
+    df["pct"] = (df["value"]/df["value"].shift(1)-1).fillna(0)
+    df["base_100"] = 100*np.cumprod(1+df["pct"])
+    df = df.set_index("date")
+    return df["base_100"].to_dict()
+
+def scrape_page(funds_code):
     """retrieve info from pages overview, performance, risk, management, fees"""
     #dictionary of result
     result = {}
@@ -535,7 +547,7 @@ def scrape_page(funds_code, proxy_dict = None):
     #url page overview
     url = 'https://www.morningstar.fr/fr/funds/snapshot/snapshot.aspx?id=%s' % (funds_code)
     #get HTML page overview
-    response = requests.get(url, headers=headers, proxies=proxy_dict)
+    response = requests.get(url, headers=headers)
     #if page non found
     
     if response.status_code == 404:
@@ -556,7 +568,7 @@ def scrape_page(funds_code, proxy_dict = None):
 
         #page 1 - performance
         url = 'https://www.morningstar.fr/fr/funds/snapshot/snapshot.aspx?id=%s&tab=1' % (funds_code)
-        response = requests.get(url, headers=headers, proxies=proxy_dict)
+        response = requests.get(url, headers=headers)
         soup = BeautifulSoup(response.text, 'html.parser')
         
         #annual performance
@@ -643,7 +655,7 @@ def scrape_page(funds_code, proxy_dict = None):
 
         #page 2 - Risk
         url = 'https://www.morningstar.fr/fr/funds/snapshot/snapshot.aspx?id=%s&tab=2' % (funds_code)
-        response = requests.get(url, headers=headers, proxies=proxy_dict)
+        response = requests.get(url, headers=headers)
         soup = BeautifulSoup(response.text, 'html.parser')
         #report date quarter performance
         risk_date = soup.find(id='ratingRiskDiv').find('td', {"class": "titleBarNote"}).text
@@ -665,7 +677,7 @@ def scrape_page(funds_code, proxy_dict = None):
 
         #page 4 - info about found
         url = 'https://www.morningstar.fr/fr/funds/snapshot/snapshot.aspx?id=%s&tab=4' % (funds_code)
-        response = requests.get(url, headers=headers, proxies=proxy_dict)
+        response = requests.get(url, headers=headers)
         soup = BeautifulSoup(response.text, 'html.parser')
         #label
         label_list = soup.find(id='managementManagementDiv').find_all('td', {"class": "col1 label"})
@@ -677,7 +689,7 @@ def scrape_page(funds_code, proxy_dict = None):
             result[label] = value_list[i].text
         #page 5 - fees
         url = 'https://www.morningstar.fr/fr/funds/snapshot/snapshot.aspx?id=%s&tab=5' % (funds_code)
-        response = requests.get(url, headers=headers, proxies=proxy_dict)
+        response = requests.get(url, headers=headers)
         soup = BeautifulSoup(response.text, 'html.parser')
         #label
         label_list =soup.find(id='managementFeesDiv').find_all('td', {"class": "label"})
