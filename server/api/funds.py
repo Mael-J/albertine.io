@@ -1,9 +1,6 @@
 from flask import Blueprint, jsonify, request, send_file
-from pandas.core.frame import DataFrame
 from calculation.ms_scraping import scrape_page
 from myclass.report import REPORT
-from investpy.utils.extra import random_user_agent
-import requests
 import json
 import pandas as pd
 from io import BytesIO
@@ -31,7 +28,7 @@ def download_pdf():
     # del cla
     pdf.seek(0)
     
-    return send_file(pdf, attachment_filename='output.pdf', as_attachment=True, mimetype='application/pdf', cache_timeout=0)
+    return send_file(pdf, download_name='output.pdf', as_attachment=True, mimetype='application/pdf')
 
 @funds.route("%s/download/excel" % (prefix), methods = ['POST'])
 def download_excel():
@@ -219,7 +216,7 @@ def download_excel():
         df_holdings = pd.concat([df_buffer, df_holdings])
 
     #blob
-    # print(output)
+    
     output = BytesIO()
     #to excel
     writer = pd.ExcelWriter(output, engine='xlsxwriter')
@@ -253,7 +250,7 @@ def download_excel():
     #save update
     writer.save()
     output.seek(0)
-    return send_file(output, attachment_filename='output.xlsx', as_attachment=True)
+    return send_file(output, download_name='output.xlsx', as_attachment=True)
 
 
 
@@ -270,9 +267,12 @@ def get_data():
     df_funds = pd.DataFrame(data["graphData"]["fund"])
     df_funds = df_funds.rename(columns= {"value" : f"{funds.name}"})
     if df.empty:
-        df = df_funds
+      df = df_funds
     else:
+      if not df_funds.empty:
         df = df.merge(df_funds, how = 'inner', on ='date', )
+  if df.empty:
+    return jsonify([]), 200
   df = df.set_index("date")
   df = (df/df.shift(1)-1).fillna(0)
   df = round(100*np.cumprod(1+df),2)
@@ -285,67 +285,79 @@ def get_data():
 @funds.route("%s/currentdata" % (prefix), methods = ['GET'])
 def get_currentdata():
   """get info about funds """
-
+  
+  
   result_list = []
   code_str = request.args.get('code')
   code_list = json.loads(code_str)
 
   for code in code_list:
-    funds = Funds(code["value"])
-    #all info from screener
-    infos_list = funds.dataPoint(['SecId',	'Name',	'PriceCurrency',	'TenforeId',	'LegalName',	'ClosePrice',	'StarRatingM255',	'SustainabilityRank',	'QuantitativeRating',	'AnalystRatingScale',	'CategoryName',	'Yield_M12',	'GBRReturnD1',	'GBRReturnW1',	'GBRReturnM1',	'GBRReturnM3',	'GBRReturnM6',	'GBRReturnM0',	'GBRReturnM12',	'GBRReturnM36',	'GBRReturnM60',	'GBRReturnM120',	'MaxFrontEndLoad',	'OngoingCostActual',	'PerformanceFeeActual',	'TransactionFeeActual',	'MaximumExitCostAcquired',	'FeeLevel',	'ManagerTenure',	'MaxDeferredLoad',	'InitialPurchase',	'FundTNAV',	'EquityStyleBox',	'BondStyleBox',	'AverageMarketCapital',	'AverageCreditQualityCode',	'EffectiveDuration',	'MorningstarRiskM255',	'AlphaM36',	'BetaM36',	'R2M36',	'StandardDeviationM36',	'SharpeM36',	'InvestorTypeRetail',	'InvestorTypeProfessional',	'InvestorTypeEligibleCounterparty',	'ExpertiseBasic',	'ExpertiseAdvanced',	'ExpertiseInformed',	'ReturnProfilePreservation',	'ReturnProfileGrowth',	'ReturnProfileIncome',	'ReturnProfileHedging',	'ReturnProfileOther',	'TrackRecordExtension',	'investmentObjective',	'investmentExpertise',	'investorType',	'investment',	'instrumentName',	'largestSector',	'globalAssetClassId',	'brandingCompanyId',	'categoryId',	'distribution',	'equityStyle',	'administratorCompanyId',	'fundSize',	'fundStyle',	'umbrellaCompanyId',	'geoRegion',	'globalCategoryId',	'investmentExpertise',	'managementStyle',	'ongoingCharge',	'riskSrri',	'shareClassType',	'starRating',	'sustainabilityRating',	'yieldPercent',	'totalReturnTimeFrame',	'totalReturn',	'iMASectorId',	'ReturnD1',	'ReturnW1',	'ReturnM1',	'ReturnM3',	'ReturnM6',	'ReturnM0',	'ReturnM12',	'ReturnM36',	'ReturnM60',	'ReturnM120',])
-    if infos_list:
-      infos = infos_list[0]
-    else:
-      infos = {}
-    #info from pages
-    pages = scrape_page(code["value"])
-    #position of the funds
-    positions= funds.position()
-    #market cap
-    marketCap = funds.marketCapitalization()
-    #sector
-    sector = funds.sector()
-    #credit Quality
-    creditQuality = funds.creditQuality()
-    #stock style
-    stockStyle = funds.equityStyle()
-    #bonds style
-    bondStyle = funds.fixedIncomeStyle()
-    #esg data
-    esgData = funds.esgData()
+    try:
+      funds = Funds(code["value"])
+      #all info from screener
+      infos_list = funds.dataPoint(['SecId',	'Name',	'PriceCurrency',	'TenforeId',	'LegalName',	'ClosePrice',	'StarRatingM255',	'SustainabilityRank',	'QuantitativeRating',	'AnalystRatingScale',	'CategoryName',	'Yield_M12',	'GBRReturnD1',	'GBRReturnW1',	'GBRReturnM1',	'GBRReturnM3',	'GBRReturnM6',	'GBRReturnM0',	'GBRReturnM12',	'GBRReturnM36',	'GBRReturnM60',	'GBRReturnM120',	'MaxFrontEndLoad',	'OngoingCostActual',	'PerformanceFeeActual',	'TransactionFeeActual',	'MaximumExitCostAcquired',	'FeeLevel',	'ManagerTenure',	'MaxDeferredLoad',	'InitialPurchase',	'FundTNAV',	'EquityStyleBox',	'BondStyleBox',	'AverageMarketCapital',	'AverageCreditQualityCode',	'EffectiveDuration',	'MorningstarRiskM255',	'AlphaM36',	'BetaM36',	'R2M36',	'StandardDeviationM36',	'SharpeM36',	'InvestorTypeRetail',	'InvestorTypeProfessional',	'InvestorTypeEligibleCounterparty',	'ExpertiseBasic',	'ExpertiseAdvanced',	'ExpertiseInformed',	'ReturnProfilePreservation',	'ReturnProfileGrowth',	'ReturnProfileIncome',	'ReturnProfileHedging',	'ReturnProfileOther',	'TrackRecordExtension',	'investmentObjective',	'investmentExpertise',	'investorType',	'investment',	'instrumentName',	'largestSector',	'globalAssetClassId',	'brandingCompanyId',	'categoryId',	'distribution',	'equityStyle',	'administratorCompanyId',	'fundSize',	'fundStyle',	'umbrellaCompanyId',	'geoRegion',	'globalCategoryId',	'investmentExpertise',	'managementStyle',	'ongoingCharge',	'riskSrri',	'shareClassType',	'starRating',	'sustainabilityRating',	'yieldPercent',	'totalReturnTimeFrame',	'totalReturn',	'iMASectorId',	'ReturnD1',	'ReturnW1',	'ReturnM1',	'ReturnM3',	'ReturnM6',	'ReturnM0',	'ReturnM12',	'ReturnM36',	'ReturnM60',	'ReturnM120',])
+      if infos_list:
+        infos = infos_list[0]
+      else:
+        infos = {}
+      #info from pages
+      pages = scrape_page(code["value"])
+      #position of the funds
+      positions= funds.position()
+      #market cap
+      marketCap = funds.marketCapitalization()
+      #sector
+      sector = funds.sector()
+      #credit Quality
+      creditQuality = funds.creditQuality()
+      #stock style
+      stockStyle = funds.equityStyle()
+      #bonds style
+      bondStyle = funds.fixedIncomeStyle()
+      #esg data
+      esgData = funds.esgData()
 
-    #carbon metrics
-    carbonMetrics = funds.carbonMetrics()
+      #carbon metrics
+      carbonMetrics = funds.carbonMetrics()
 
-    #number of bonds
-    if 'numberOfBondHolding' in positions:
-      numberOfBondHolding = positions["numberOfBondHolding"]
-    else:
-      numberOfBondHolding = 0
+      #number of bonds
+      if 'numberOfBondHolding' in positions:
+        numberOfBondHolding = positions["numberOfBondHolding"]
+      else:
+        numberOfBondHolding = 0
 
-    #number of equities
-    if 'numberOfEquityHolding' in positions:
-      numberOfEquityHolding = positions["numberOfEquityHolding"]
-    else:
-      numberOfEquityHolding = 0
+      #number of equities
+      if 'numberOfEquityHolding' in positions:
+        numberOfEquityHolding = positions["numberOfEquityHolding"]
+      else:
+        numberOfEquityHolding = 0
 
-    #number of other holdings
-    if 'numberOfOtherHolding' in positions:
-      numberOfOtherHolding = positions["numberOfOtherHolding"]
+      #number of other holdings
+      if 'numberOfOtherHolding' in positions:
+        numberOfOtherHolding = positions["numberOfOtherHolding"]
+      else:
+        numberOfOtherHolding = 0
+      
+
+      result = {'infos': infos, 'pages' : pages, 'positions': positions, 
+                'marketCap': marketCap,'sector' : sector,
+                'creditQuality' : creditQuality,'stockStyle' : stockStyle, 'bondStyle' : bondStyle,
+                'esgData' : esgData, 'carbonMetrics' : carbonMetrics, 'numberOfBondHolding' : numberOfBondHolding,
+                'numberOfEquityHolding': numberOfEquityHolding, 'numberOfOtherHolding': numberOfOtherHolding,
+                
+                }
+      result_list.append(result)
+    except:
+      continue
+    if result_list:
+      return jsonify(result_list), 200
     else:
-      numberOfOtherHolding = 0
+      return jsonify([0]), 200
+
+    
     
 
-    result = {'infos': infos, 'pages' : pages, 'positions': positions, 
-              'marketCap': marketCap,'sector' : sector,
-              'creditQuality' : creditQuality,'stockStyle' : stockStyle, 'bondStyle' : bondStyle,
-              'esgData' : esgData, 'carbonMetrics' : carbonMetrics, 'numberOfBondHolding' : numberOfBondHolding,
-              'numberOfEquityHolding': numberOfEquityHolding, 'numberOfOtherHolding': numberOfOtherHolding,
-              
-              }
-    result_list.append(result)
-  return result_list
+    
 
 @funds.route("%s/info/<code>" % (prefix), methods = ['GET'])
 def get_info(code):

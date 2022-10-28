@@ -273,7 +273,7 @@ const Funds = () => {
             return response.json();
         }).then(response => {
             setPortInfos(response);
-                console.log(response);
+                
                 //fetching is done
                  setFundIsLoading(false);
             }).catch(error => {
@@ -284,7 +284,7 @@ const Funds = () => {
             return response.json();
         }).then(response => {
                 setHistoData(response);
-                console.log(response);
+                
             }).catch(error => {
                 console.error(error.message);
             });
@@ -461,7 +461,10 @@ const Funds = () => {
     // fund info
     const fundInfo = () => {
         if (portInfos.length === 0) {
-            return (<div></div>)
+            return (<div></div>) }
+        else if (portInfos[0] === 0) {
+            return (<div className="mt-4">Aucunes données à afficher pour ces fonds, veuillez sélectionner d'autres fonds.</div>)
+        
         } else {
 
         
