@@ -349,10 +349,10 @@ def get_currentdata():
       result_list.append(result)
     except:
       continue
-    if result_list:
-      return jsonify(result_list), 200
-    else:
-      return jsonify([0]), 200
+  if result_list:
+    return jsonify(result_list), 200
+  else:
+    return jsonify([0]), 200
 
     
     
